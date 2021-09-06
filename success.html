@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+  <script>
+    // below color converter
+    // Make sure to include https://www.w3schools.com/lib/w3color.js
+    var colora1, rgba1, hexa1;
+
+    $('#colora1').on('keyup', function () {
+      colora1 = w3color($(this).val());
+
+      if (colora1.valid) {
+        hexa1 = colora1.toHexString();
+
+        $('#hexa1').html(hexa1);
+
+        if (colora1.opacity == 1) {
+          rgba1 = colora1.toRgbString();
+
+          $('#rgbNamea1').text('Rgb');
+          $('#hslNamea1').text('Hex');
+        }
+        else {
+          rgba1 = colora1.toRgbaString();
+          hexa1 = colora1.toHslaString();
+
+          $('#rgbNamea1').text('Rgba');
+          $('#hslNamea1').text('Hsla');
+        }
+        $('#rgba1').val(rgba1);
+        $('#hexa1').val(hexa1);
+      }
+
+    });
+  </script>
+
+  <style>
+    body {
+      text-align: center;
+    }
+
+    #view-color {
+      width: 200px;
+      height: 200px;
+      border: solid #000 1px;
+      margin: 10px auto;
+    }
+
+    .colors {
+      width: 200px;
+      margin: 20px auto;
+    }
+
+    #colora1,
+    textarea {
+      width: 100%;
+      height: 20px;
+    }
+
+    .center {
+  margin: auto;
+  width: 50%;
+ 
+  padding: 10px;
+}
+
+  </style>
+
+
+
+</head>
+
+<body onload="changeColor()" style="background-color:#f6f4f2;">
+
+
+  <div class="card center" style="width: 50rem;">
+<img src="https://brandbikes.nl/wp-content/uploads/2019/04/rituals-logo-fc.jpg" id="view-color">
+    
+  
+
+    <h1 class="card-title">Output set!</h1>
+    <form action="/">
+        <button class="btn btn-primary" type="submit">Back</button>
+    </form>
+
+
+
+  </div>
+</div>
+
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+
+</html>
+
+<!--
+https://stackoverflow.com/questions/52820048/color-does-not-want-to-convert-automatically
+-->

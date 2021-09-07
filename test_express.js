@@ -42,23 +42,40 @@ serialPort.on('readable', function () {
   console.log('Data:', serialPort.read())
 })
 
-function writeToLed() {
-  console.log('functie aangeroepen ===========================================================')
+function initialLedToWhite() {
+  console.log('initialLedToWhite')
   // //update color command
   // serialPort.write('X001B[12123456]');
   //ledstrip on command to white
-  serialPort.write('X002B[291005]' + '\r\n');
+  serialPort.write('X002B[290005]' + '\r\n');
+  //green
+  //serialPort.write('X002B[290405]' + '\r\n');
   // ledstrip off
   //serialPort.write('X002B[200005]' + '\r\n');
 }
 
-writeToLed();
+initialLedToWhite();
+
+function updateLedWithHex(hex){
+  console.log('updateLedWithHex')
+  hexWithoutHashtag = hex.slice(1);
+  console.log(`X001B[12${hexWithoutHashtag}]`)
+  //update color 2
+  //serialPort.write(`X001B[12${hexWithoutHashtag}]` + '\r\n');
+  //push to led
+  //serialPort.write('X002B[290205]' + '\r\n');
+
+  
+  serialPort.write('X002B[290405]' + '\r\n');
+
+}
 
 
 // Maak de variablen aan zodat er data naar terug kan. 
 var hue = 999;
 var sat = 999;
 var light = 999;
+var hexDataGlobal = 'ffffff';
 
 //setup router template /w var to frontend
 app.get('/', function (req, res) {
@@ -80,12 +97,14 @@ app.post('/', (req, res) => {
   console.log('incoming rgb data: ', rgbdata)
   console.log('incoming hex data: ', hexdata)
   //res.end()
+  hexDataGlobal = req.body.hexoutput;
+  console.log(req.body.hexoutput, 'testmet hexoutput in ophaal functie');
   
+  updateLedWithHex(req.body.hexoutput);
 
   hexdata = hexdata.substring(1);
 
   console.log('split hexdata:', hexdata)
-
 
   rgbdata = rgbdata.substring(
   rgbdata.lastIndexOf("(") + 1,
@@ -127,18 +146,17 @@ console.log(hexdata);
 
 serialPort.on('writable', function () {
   console.log(comPort + ' is open');
-  serialPort.write(hexdata + '\r\n');
-  serialPort.write(setData + '\r\n');
-  writeToLed();
+  // serialPort.write(hexdata + '\r\n');
+  // serialPort.write(setData + '\r\n');
 });
 
 serialPort.write('open', function() {
-  serialPort.write(hexdata, function(err) {
-   if (err) {
-    return console.log('Error on write: ', err.message);
-   }
-   console.log('hexdata set');
-  });
+  // serialPort.write(hexdata, function(err) {
+  //  if (err) {
+  //   return console.log('Error on write: ', err.message);
+  //  }
+  //  console.log('hexdata set');
+  // });
 });
 
 })
@@ -174,6 +192,7 @@ var x = serialPort.on('data', function (data) {
   );
   console.log("Clean msg", cleanmsg)
   console.log("Hue Sander: ", hue);
+
 
 
   if (cleanmsg == "Cv=XXX,XXX,XXX") {

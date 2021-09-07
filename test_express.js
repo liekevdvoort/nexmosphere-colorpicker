@@ -37,13 +37,22 @@ const serialPort = new SerialPort('COM3', {
 // Read data that is available but keep the stream in "paused mode"
 serialPort.on('readable', function () {
   const parser = serialPort.pipe(new Readline({
-    delimiter: '\r'
+    delimiter: '\r\n'
   }))
   console.log('Data:', serialPort.read())
 })
 
+function writeToLed() {
+  console.log('functie aangeroepen ===========================================================')
+  // //update color command
+  // serialPort.write('X001B[12123456]');
+  //ledstrip on command to white
+  serialPort.write('X002B[291005]' + '\r\n');
+  // ledstrip off
+  //serialPort.write('X002B[200005]' + '\r\n');
+}
 
-
+writeToLed();
 
 
 // Maak de variablen aan zodat er data naar terug kan. 
@@ -84,7 +93,7 @@ app.post('/', (req, res) => {
 );
 
 rgbdatarray = rgbdata.split(',')
-r =  rgbdatarray[0];
+r = rgbdatarray[0];
 g = rgbdatarray[1];
 b = rgbdatarray[2];
 
@@ -118,8 +127,9 @@ console.log(hexdata);
 
 serialPort.on('writable', function () {
   console.log(comPort + ' is open');
-  serialPort.write(hexdata + '\r');
-  serialPort.write(setData + '\r');
+  serialPort.write(hexdata + '\r\n');
+  serialPort.write(setData + '\r\n');
+  writeToLed();
 });
 
 serialPort.write('open', function() {
@@ -199,7 +209,7 @@ var x = serialPort.on('data', function (data) {
 
 // Pipe the data into another stream (like a parser or standard out)
 const lineStream = serialPort.pipe(new Readline({
-  delimiter: '\r'
+  delimiter: '\r\n'
 }))
 
 

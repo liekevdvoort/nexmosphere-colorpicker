@@ -7,75 +7,26 @@ const app = express();
 const http = require('http').createServer(app)
 const io = require('socket.io')(http)
 
+//init vars
+const port = 3000
+var rgbdata = ""
+var r, g, b;
+const name = "Boykes";
+var likes = 0;
+var rgbout = "";
+
 app.use(express.urlencoded({
   extended: true
 }))
-
-
-
-var rgbdata = ""
-var r, g, b;
-
-//init vars
-const port = 3000
-const name = "Boykes";
-
-var likes = 0;
-var rgbout = "";
 
 //setup react and viewengine
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 
-
-
-//init serial comms
-const serialPort = new SerialPort('COM3', {
-  baudRate: 115200
+//run server
+app.listen(port, () => {
+  console.log(`Example app listening at http://localhost:${port}`)
 })
-//do some serial input stuff here
-// Read data that is available but keep the stream in "paused mode"
-serialPort.on('readable', function () {
-  const parser = serialPort.pipe(new Readline({
-    delimiter: '\r\n'
-  }))
-  console.log('Data:', serialPort.read())
-})
-
-function initialLedToWhite() {
-  console.log('initialLedToWhite')
-  // //update color command
-  // serialPort.write('X001B[12123456]');
-  //ledstrip on command to white
-  serialPort.write('X002B[290005]' + '\r\n');
-  //green
-  //serialPort.write('X002B[290405]' + '\r\n');
-  // ledstrip off
-  //serialPort.write('X002B[200005]' + '\r\n');
-}
-
-initialLedToWhite();
-
-function updateLedWithHex(hex){
-  console.log('updateLedWithHex')
-  hexWithoutHashtag = hex.slice(1);
-  console.log(`X001B[12${hexWithoutHashtag}]`)
-  //update color 2
-  //serialPort.write(`X001B[12${hexWithoutHashtag}]` + '\r\n');
-  //push to led
-  //serialPort.write('X002B[290205]' + '\r\n');
-
-  
-  serialPort.write('X002B[290405]' + '\r\n');
-
-}
-
-
-// Maak de variablen aan zodat er data naar terug kan. 
-var hue = 999;
-var sat = 999;
-var light = 999;
-var hexDataGlobal = 'ffffff';
 
 //setup router template /w var to frontend
 app.get('/', function (req, res) {
@@ -161,6 +112,50 @@ serialPort.write('open', function() {
 
 })
 
+//init serial comms
+const serialPort = new SerialPort('COM8', {
+  baudRate: 115200
+})
+//do some serial input stuff here
+// Read data that is available but keep the stream in "paused mode"
+// serialPort.on('readable', function () {
+//   const parser = serialPort.pipe(new Readline({
+//     delimiter: '\r\n'
+//   }))
+//   console.log('Data:', serialPort.read())
+// })
+
+function write_serial(command){
+  serialPort.write(command);
+}
+
+function write_to_serial(command){
+    setTimeout(write_serial, 300, command)
+}
+
+function updateLedWithHex(hex){
+  console.log('updateLedWithHex')
+  hexWithoutHashtag = hex.slice(1);
+  console.log(`X001B[12${hexWithoutHashtag}]`)
+  //update color 2
+  //serialPort.write(`X001B[12${hexWithoutHashtag}]` + '\r\n');
+  //push to led
+  //serialPort.write('X002B[290205]' + '\r\n');
+
+  
+  write_to_serial('X002B[290005]\r\n');
+
+}
+
+
+// Maak de variablen aan zodat er data naar terug kan. 
+var hue = 999;
+var sat = 999;
+var light = 999;
+// var hexDataGlobal = 'ffffff';
+
+
+
 
 
 
@@ -181,55 +176,55 @@ serialPort.write('open', function() {
 
 
 // Switches the port into "flowing mode"
-var x = serialPort.on('data', function (data) {
+// var x = serialPort.on('data', function (data) {
 
-  var msg = data.toString()
-  console.log('msg: ', msg);
+//   var msg = data.toString()
+//   console.log('msg: ', msg);
 
-  var cleanmsg = msg.substring(
-    msg.lastIndexOf("[") + 1,
-    msg.lastIndexOf("]"),
-  );
-  console.log("Clean msg", cleanmsg)
-  console.log("Hue Sander: ", hue);
+//   var cleanmsg = msg.substring(
+//     msg.lastIndexOf("[") + 1,
+//     msg.lastIndexOf("]"),
+//   );
+//   console.log("Clean msg", cleanmsg)
+//   console.log("Hue Sander: ", hue);
 
 
 
-  if (cleanmsg == "Cv=XXX,XXX,XXX") {
-    console.log("Not a clean message")
-  } else {
-    //console.log('Received cleanmsg: ', cleanmsg);
+//   if (cleanmsg == "Cv=XXX,XXX,XXX") {
+//     console.log("Not a clean message")
+//   } else {
+//     //console.log('Received cleanmsg: ', cleanmsg);
 
-    cleanmsg = cleanmsg.substring(3);
-    cleanmsg = cleanmsg.split(',');
+//     cleanmsg = cleanmsg.substring(3);
+//     cleanmsg = cleanmsg.split(',');
 
-    //console.log('cleanmsg 1: ', parseInt(cleanmsg[0]));
-    //console.log('cleanmsg 2: ', parseInt(cleanmsg[1]));
-    //console.log('cleanmsg 3: ', parseInt(cleanmsg[2]));
+//     //console.log('cleanmsg 1: ', parseInt(cleanmsg[0]));
+//     //console.log('cleanmsg 2: ', parseInt(cleanmsg[1]));
+//     //console.log('cleanmsg 3: ', parseInt(cleanmsg[2]));
 
-    msg = "";
-    // de "Var" weggehaald 
-    hue_1 = parseInt(cleanmsg[0]);
-    sat_1 = parseInt(cleanmsg[1]);
-    light_1 = parseInt(cleanmsg[2])
+//     msg = "";
+//     // de "Var" weggehaald 
+//     hue_1 = parseInt(cleanmsg[0]);
+//     sat_1 = parseInt(cleanmsg[1]);
+//     light_1 = parseInt(cleanmsg[2])
 
-    if (hue_1 > 0 && sat_1 > 0 && light_1 > 0) {
-      hue = hue_1;
-      sat = sat_1;
-      light = light_1;
-      console.log('-------------------------------------------------------------------------------------------------------');
-      console.log('Hue: ', hue);
-      console.log('Saturation: ', sat);
-      console.log('Lightness: ', light);
-      console.log('-------------------------------------------------------------------------------------------------------');
-    }
-  }
-})
+//     if (hue_1 > 0 && sat_1 > 0 && light_1 > 0) {
+//       hue = hue_1;
+//       sat = sat_1;
+//       light = light_1;
+//       console.log('-------------------------------------------------------------------------------------------------------');
+//       console.log('Hue: ', hue);
+//       console.log('Saturation: ', sat);
+//       console.log('Lightness: ', light);
+//       console.log('-------------------------------------------------------------------------------------------------------');
+//     }
+//   }
+// })
 
 // Pipe the data into another stream (like a parser or standard out)
-const lineStream = serialPort.pipe(new Readline({
-  delimiter: '\r\n'
-}))
+// const lineStream = serialPort.pipe(new Readline({
+//   delimiter: '\r\n'
+// }))
 
 
 
@@ -240,10 +235,7 @@ const lineStream = serialPort.pipe(new Readline({
 
 
 
-//run server
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
-})
+
 
 //http.listen(3000, () => console.log('the app is running on localhost:3000'))
 

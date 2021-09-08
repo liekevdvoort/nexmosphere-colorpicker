@@ -6,7 +6,7 @@ const path = require('path');
 
 const app = express();
 const server = http.createServer(app)
-const serialPort = new SerialPort("COM8", {
+const serialPort = new SerialPort("COM3", {
     baudRate: 115200
 });
 
@@ -72,6 +72,7 @@ serialPort.on('data', function(data){
     var msg = data.toString()
     var cleanmsg = msg.substring(msg.lastIndexOf("[") + 1, msg.lastIndexOf("]"),);
 
+    console.log(cleanmsg + '_____________________________________________');
     if (cleanmsg == "Cv=XXX,XXX,XXX") {
         console.log("Not a clean message")
     }else {

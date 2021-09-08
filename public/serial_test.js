@@ -72,10 +72,10 @@ serialPort.on('data', function(data){
     var msg = data.toString()
     var cleanmsg = msg.substring(msg.lastIndexOf("[") + 1, msg.lastIndexOf("]"),);
 
-    console.log(cleanmsg + '_____________________________________________');
     if (cleanmsg == "Cv=XXX,XXX,XXX") {
         console.log("Not a clean message")
     }else {
+        console.log(cleanmsg + '_____________________________________________');
         cleanmsg = cleanmsg.substring(3).split(',');
         hue_1 = parseInt(cleanmsg[0]);
         sat_1 = parseInt(cleanmsg[1]);

@@ -6,7 +6,7 @@ const path = require('path');
 
 const app = express();
 const server = http.createServer(app)
-const serialPort = new SerialPort("COM8", {
+const serialPort = new SerialPort("COM7", {
     baudRate: 115200
 });
 
@@ -54,10 +54,6 @@ app.post('/', function(request, response){
 
     setTimeout(write_to_serial, 300, `X002B[10${hex_data_without_hashtag}]\r\n`);
     setTimeout(write_to_serial, 600, `X002B[299005]\r\n`);
-
-    hue = 999;
-    sat = 999;
-    light = 999;
 });
 
 function write_to_serial(command){
@@ -71,6 +67,7 @@ serialPort.on("open", function(){
 serialPort.on('data', function(data){
     var msg = data.toString()
     var cleanmsg = msg.substring(msg.lastIndexOf("[") + 1, msg.lastIndexOf("]"),);
+    console.log(cleanmsg);
 
     if (cleanmsg == "Cv=XXX,XXX,XXX") {
         console.log("Not a clean message")
